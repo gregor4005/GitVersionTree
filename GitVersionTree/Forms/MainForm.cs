@@ -323,7 +323,7 @@ namespace GitVersionTree
                 DotStringBuilder.Append("  subgraph Decorate" + DecorateCount + "\r\n");
                 DotStringBuilder.Append("  {\r\n");
                 DotStringBuilder.Append("    rank=\"same\";\r\n");
-                if (DecorateKeyValuePair.Value.Trim().Substring(0, 5) == "(tag:")
+                if (DecorateKeyValuePair.Value.Trim().StartsWith("(tag:"))
                 {
                     DotStringBuilder.Append("    \"" + DecorateKeyValuePair.Value.Trim() + "\" [shape=\"box\", style=\"filled\", fillcolor=\"#ffffdd\"];\r\n");
                 }
