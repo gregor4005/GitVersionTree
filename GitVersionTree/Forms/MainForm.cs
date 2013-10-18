@@ -291,6 +291,15 @@ namespace GitVersionTree
                 }
             }
 
+            if (IsCompressHistoryCheckBox.Checked)
+            {
+                Nodes = (from node in Nodes
+                        select node.Count > 2 ? 
+                                    (new List<string>(new []{ node[0], String.Format("{0} histories omitted", node.Count - 2), node[node.Count-1]})) 
+                                    : node).ToList();
+            }
+
+
             Status("Processed " + Nodes.Count + " branch(es) ...");
 
             StringBuilder DotStringBuilder = new StringBuilder();

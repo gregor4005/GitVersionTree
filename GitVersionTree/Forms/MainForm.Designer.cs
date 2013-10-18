@@ -45,6 +45,7 @@
             this.StatusRichTextBox = new System.Windows.Forms.RichTextBox();
             this.GenerateButton = new System.Windows.Forms.Button();
             this.HomepageLinkLabel = new System.Windows.Forms.LinkLabel();
+            this.IsCompressHistoryCheckBox = new System.Windows.Forms.CheckBox();
             this.TargetPathGroupBox.SuspendLayout();
             this.PathConfigurationGroupBox.SuspendLayout();
             this.StatusGroupBox.SuspendLayout();
@@ -63,8 +64,8 @@
             // 
             // TargetPathGroupBox
             // 
-            this.TargetPathGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.TargetPathGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.TargetPathGroupBox.Controls.Add(this.GitRepositoryPathTextBox);
             this.TargetPathGroupBox.Controls.Add(this.GitRepositoryPathBrowseButton);
             this.TargetPathGroupBox.Controls.Add(this.GitRepositoryPathLabel);
@@ -77,8 +78,8 @@
             // 
             // GitRepositoryPathTextBox
             // 
-            this.GitRepositoryPathTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.GitRepositoryPathTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.GitRepositoryPathTextBox.Location = new System.Drawing.Point(120, 21);
             this.GitRepositoryPathTextBox.Name = "GitRepositoryPathTextBox";
             this.GitRepositoryPathTextBox.ReadOnly = true;
@@ -107,8 +108,8 @@
             // 
             // PathConfigurationGroupBox
             // 
-            this.PathConfigurationGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.PathConfigurationGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.PathConfigurationGroupBox.Controls.Add(this.GraphvizDotPathBrowseButton);
             this.PathConfigurationGroupBox.Controls.Add(this.GitPathBrowseButton);
             this.PathConfigurationGroupBox.Controls.Add(this.GraphvizDotPathTextBox);
@@ -146,8 +147,8 @@
             // 
             // GraphvizDotPathTextBox
             // 
-            this.GraphvizDotPathTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.GraphvizDotPathTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.GraphvizDotPathTextBox.Location = new System.Drawing.Point(120, 50);
             this.GraphvizDotPathTextBox.Name = "GraphvizDotPathTextBox";
             this.GraphvizDotPathTextBox.ReadOnly = true;
@@ -156,8 +157,8 @@
             // 
             // GitPathTextBox
             // 
-            this.GitPathTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.GitPathTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.GitPathTextBox.Location = new System.Drawing.Point(120, 23);
             this.GitPathTextBox.Name = "GitPathTextBox";
             this.GitPathTextBox.ReadOnly = true;
@@ -184,25 +185,25 @@
             // 
             // StatusGroupBox
             // 
-            this.StatusGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.StatusGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.StatusGroupBox.Controls.Add(this.StatusRichTextBox);
-            this.StatusGroupBox.Location = new System.Drawing.Point(12, 184);
+            this.StatusGroupBox.Location = new System.Drawing.Point(12, 196);
             this.StatusGroupBox.Name = "StatusGroupBox";
-            this.StatusGroupBox.Size = new System.Drawing.Size(467, 142);
+            this.StatusGroupBox.Size = new System.Drawing.Size(467, 130);
             this.StatusGroupBox.TabIndex = 2;
             this.StatusGroupBox.TabStop = false;
             this.StatusGroupBox.Text = "Status";
             // 
             // StatusRichTextBox
             // 
-            this.StatusRichTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.StatusRichTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.StatusRichTextBox.Location = new System.Drawing.Point(6, 19);
             this.StatusRichTextBox.Name = "StatusRichTextBox";
-            this.StatusRichTextBox.Size = new System.Drawing.Size(455, 117);
+            this.StatusRichTextBox.Size = new System.Drawing.Size(455, 105);
             this.StatusRichTextBox.TabIndex = 0;
             this.StatusRichTextBox.Text = "";
             // 
@@ -229,11 +230,22 @@
             this.HomepageLinkLabel.Text = "Homepage";
             this.HomepageLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.HomepageLinkLabel_LinkClicked);
             // 
+            // IsCompressHistoryCheckBox
+            // 
+            this.IsCompressHistoryCheckBox.AutoSize = true;
+            this.IsCompressHistoryCheckBox.Location = new System.Drawing.Point(12, 173);
+            this.IsCompressHistoryCheckBox.Name = "IsCompressHistoryCheckBox";
+            this.IsCompressHistoryCheckBox.Size = new System.Drawing.Size(105, 17);
+            this.IsCompressHistoryCheckBox.TabIndex = 6;
+            this.IsCompressHistoryCheckBox.Text = "Compress history";
+            this.IsCompressHistoryCheckBox.UseVisualStyleBackColor = true;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(492, 366);
+            this.Controls.Add(this.IsCompressHistoryCheckBox);
             this.Controls.Add(this.HomepageLinkLabel);
             this.Controls.Add(this.GenerateButton);
             this.Controls.Add(this.StatusGroupBox);
@@ -273,6 +285,7 @@
         private System.Windows.Forms.Button GitPathBrowseButton;
         private System.Windows.Forms.LinkLabel HomepageLinkLabel;
         private System.Windows.Forms.RichTextBox StatusRichTextBox;
+        private System.Windows.Forms.CheckBox IsCompressHistoryCheckBox;
     }
 }
 
