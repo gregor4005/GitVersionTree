@@ -89,17 +89,16 @@ namespace GitVersionTree
 				string.IsNullOrEmpty(Properties.Settings.Default.GitRepositoryPath))
 			{
 				MessageBox.Show("Please select a Git, Graphviz & Git repository.", "Generate", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				return;
 			}
-			else
-			{
-				StatusRichTextBox.Text = "";
-				_repositoryName = new DirectoryInfo(GitRepositoryPathTextBox.Text).Name;
-				_dotFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), _repositoryName + ".dot");
-				_pdfFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), _repositoryName + ".pdf");
-				_logFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), _repositoryName + ".log");
-				File.WriteAllText(_logFilename, "");
-				_generator.Generate(_repositoryName, _dotFilename, _pdfFilename, _logFilename, IsCompressHistoryCheckBox.Checked);
-			}
+
+			StatusRichTextBox.Text = "";
+			_repositoryName = new DirectoryInfo(GitRepositoryPathTextBox.Text).Name;
+			_dotFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), _repositoryName + ".dot");
+			_pdfFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), _repositoryName + ".pdf");
+			_logFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), _repositoryName + ".log");
+			File.WriteAllText(_logFilename, "");
+			_generator.Generate(_repositoryName, _dotFilename, _pdfFilename, _logFilename, IsCompressHistoryCheckBox.Checked);
 		}
 		//---------------------------------------------------------------------
 		private void HomepageLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
