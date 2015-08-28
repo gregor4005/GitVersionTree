@@ -27,64 +27,66 @@ namespace GitVersionTree
 			this.RefreshPath();
 		}
 		//---------------------------------------------------------------------
+		private void BrowseForPath(string fileName, string filter, ref string path)
+		{
+			using (OpenFileDialog openFileDialog = new OpenFileDialog())
+			{
+				openFileDialog.Title = string.Format("Select {0}", fileName);
+
+				if (!string.IsNullOrEmpty(path))
+					openFileDialog.InitialDirectory = path;
+
+				openFileDialog.FileName = fileName;
+				openFileDialog.Filter = filter;
+
+				if (openFileDialog.ShowDialog() == DialogResult.OK)
+					path = openFileDialog.FileName;
+			}
+		}
+		//---------------------------------------------------------------------
 		private void GitPathBrowseButton_Click(object sender, EventArgs e)
 		{
-			OpenFileDialog browseOpenFileDialog = new OpenFileDialog();
-			browseOpenFileDialog.Title = "Select git.exe";
-			if (!String.IsNullOrEmpty(Properties.Settings.Default.GitPath))
-			{
-				browseOpenFileDialog.InitialDirectory = Properties.Settings.Default.GitPath;
-			}
-			browseOpenFileDialog.FileName = "git.exe";
-			browseOpenFileDialog.Filter = "Git Application (git.exe)|git.exe";
-			if (browseOpenFileDialog.ShowDialog() == DialogResult.OK)
-			{
-				Properties.Settings.Default.GitPath = browseOpenFileDialog.FileName;
-				Properties.Settings.Default.Save();
-				RefreshPath();
-			}
+			string path = Properties.Settings.Default.GitPath;
+			this.BrowseForPath("git.exe", "Git Application (git.exe)|git.exe", ref path);
+			Properties.Settings.Default.GitPath = path;
+			Properties.Settings.Default.Save();
+			this.RefreshPath();
 		}
 		//---------------------------------------------------------------------
 		private void GraphvizDotPathBrowseButton_Click(object sender, EventArgs e)
 		{
-			OpenFileDialog browseOpenFileDialog = new OpenFileDialog();
-			browseOpenFileDialog.Title = "Select dot.exe";
-			if (!String.IsNullOrEmpty(Properties.Settings.Default.GraphvizPath))
-			{
-				browseOpenFileDialog.InitialDirectory = Properties.Settings.Default.GraphvizPath;
-			}
-			browseOpenFileDialog.FileName = "dot.exe";
-			browseOpenFileDialog.Filter = "Graphviz Dot Application (dot.exe)|dot.exe";
-			if (browseOpenFileDialog.ShowDialog() == DialogResult.OK)
-			{
-				Properties.Settings.Default.GraphvizPath = browseOpenFileDialog.FileName;
-				Properties.Settings.Default.Save();
-				RefreshPath();
-			}
+			string path = Properties.Settings.Default.GraphvizPath;
+			this.BrowseForPath("dot.exe", "Graphviz Dot Application (dot.exe)|dot.exe", ref path);
+			Properties.Settings.Default.GraphvizPath = path;
+			Properties.Settings.Default.Save();
+			this.RefreshPath();
 		}
 		//---------------------------------------------------------------------
 		private void GitRepositoryPathBrowseButton_Click(object sender, EventArgs e)
 		{
-			FolderBrowserDialog browseFolderBrowserDialog = new FolderBrowserDialog();
-			browseFolderBrowserDialog.Description = "Select Git repository";
-			browseFolderBrowserDialog.ShowNewFolderButton = false;
-			if (!String.IsNullOrEmpty(Properties.Settings.Default.GitRepositoryPath))
+			using (FolderBrowserDialog browseFolderBrowserDialog = new FolderBrowserDialog())
 			{
-				browseFolderBrowserDialog.SelectedPath = Properties.Settings.Default.GitRepositoryPath;
-			}
-			if (browseFolderBrowserDialog.ShowDialog() == DialogResult.OK)
-			{
-				Properties.Settings.Default.GitRepositoryPath = browseFolderBrowserDialog.SelectedPath;
-				Properties.Settings.Default.Save();
-				RefreshPath();
+				browseFolderBrowserDialog.Description = "Select Git repository";
+				browseFolderBrowserDialog.ShowNewFolderButton = false;
+
+				if (!string.IsNullOrEmpty(Properties.Settings.Default.GitRepositoryPath))
+
+					browseFolderBrowserDialog.SelectedPath = Properties.Settings.Default.GitRepositoryPath;
+
+				if (browseFolderBrowserDialog.ShowDialog() == DialogResult.OK)
+				{
+					Properties.Settings.Default.GitRepositoryPath = browseFolderBrowserDialog.SelectedPath;
+					Properties.Settings.Default.Save();
+					this.RefreshPath();
+				}
 			}
 		}
 		//---------------------------------------------------------------------
 		private void GenerateButton_Click(object sender, EventArgs e)
 		{
-			if (String.IsNullOrEmpty(Properties.Settings.Default.GitPath) ||
-				String.IsNullOrEmpty(Properties.Settings.Default.GraphvizPath) ||
-				String.IsNullOrEmpty(Properties.Settings.Default.GitRepositoryPath))
+			if (string.IsNullOrEmpty(Properties.Settings.Default.GitPath) ||
+				string.IsNullOrEmpty(Properties.Settings.Default.GraphvizPath) ||
+				string.IsNullOrEmpty(Properties.Settings.Default.GitRepositoryPath))
 			{
 				MessageBox.Show("Please select a Git, Graphviz & Git repository.", "Generate", MessageBoxButtons.OK, MessageBoxIcon.Information);
 			}
@@ -112,18 +114,14 @@ namespace GitVersionTree
 		//---------------------------------------------------------------------
 		private void RefreshPath()
 		{
-			if (!String.IsNullOrEmpty(Properties.Settings.Default.GitPath))
-			{
+			if (!string.IsNullOrEmpty(Properties.Settings.Default.GitPath))
 				GitPathTextBox.Text = Properties.Settings.Default.GitPath;
-			}
-			if (!String.IsNullOrEmpty(Properties.Settings.Default.GraphvizPath))
-			{
+
+			if (!string.IsNullOrEmpty(Properties.Settings.Default.GraphvizPath))
 				GraphvizDotPathTextBox.Text = Properties.Settings.Default.GraphvizPath;
-			}
-			if (!String.IsNullOrEmpty(Properties.Settings.Default.GitRepositoryPath))
-			{
+
+			if (!string.IsNullOrEmpty(Properties.Settings.Default.GitRepositoryPath))
 				GitRepositoryPathTextBox.Text = Properties.Settings.Default.GitRepositoryPath;
-			}
 		}
 		//---------------------------------------------------------------------
 		private void Generator_StatusUpdated(object sender, Utils.StatusEventArgs e)
