@@ -8,9 +8,9 @@ namespace GitVersionTree
 {
 	public partial class MainForm : Form
 	{
-		private string _dotFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), Application.ProductName + ".dot");
-		private string _pdfFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), Application.ProductName + ".pdf");
-		private string _logFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), Application.ProductName + ".log");
+		private string _dotFilename;
+		private string _pdfFilename;
+		private string _logFilename;
 		private string _repositoryName;
 		private Generator _generator = new Generator();
 		//---------------------------------------------------------------------

@@ -25,12 +25,12 @@ namespace GitVersionTree.Services
 
 			Process executeProcess = new Process();
 
-			executeProcess.StartInfo.UseShellExecute = false;
-			executeProcess.StartInfo.CreateNoWindow = true;
+			executeProcess.StartInfo.UseShellExecute 		= false;
+			executeProcess.StartInfo.CreateNoWindow 		= true;
 			executeProcess.StartInfo.RedirectStandardOutput = true;
-			executeProcess.StartInfo.FileName = command;
-			executeProcess.StartInfo.Arguments = argument;
-			executeProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+			executeProcess.StartInfo.FileName 				= command;
+			executeProcess.StartInfo.Arguments 				= argument;
+			executeProcess.StartInfo.WindowStyle 			= ProcessWindowStyle.Hidden;
 
 			executeProcess.Start();
 			executeResult = executeProcess.StandardOutput.ReadToEnd();
@@ -264,9 +264,7 @@ namespace GitVersionTree.Services
 				}
 			}
 			else
-			{
 				this.OnStatusUpdated("Version tree generation failed ...");
-			}
 
 			this.OnStatusUpdated("Done! ...");
 		}
