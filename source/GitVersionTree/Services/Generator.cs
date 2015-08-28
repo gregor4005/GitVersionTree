@@ -19,125 +19,119 @@ namespace GitVersionTree.Services
 				tmp(this, new StatusEventArgs(message));
 		}
 		//---------------------------------------------------------------------
-		private string Execute(string command, string argument)
+		private static string Execute(string command, string argument)
 		{
 			string executeResult = String.Empty;
-			
+
 			Process executeProcess = new Process();
-			
+
 			executeProcess.StartInfo.UseShellExecute 		= false;
 			executeProcess.StartInfo.CreateNoWindow 		= true;
 			executeProcess.StartInfo.RedirectStandardOutput = true;
 			executeProcess.StartInfo.FileName 				= command;
 			executeProcess.StartInfo.Arguments 				= argument;
 			executeProcess.StartInfo.WindowStyle 			= ProcessWindowStyle.Hidden;
-			
+
 			executeProcess.Start();
 			executeResult = executeProcess.StandardOutput.ReadToEnd();
 			executeProcess.WaitForExit();
-			
+
 			if (executeProcess.ExitCode == 0)
-			{
 				return executeResult;
-			}
 			else
-			{
 				return String.Empty;
-			}
 		}
 		//---------------------------------------------------------------------
 		public void Generate(
-			string RepositoryName,
-			string DotFilename, 
-			string PdfFilename, 
-			string LogFilename, 
+			string repositoryName,
+			string dotFilename, 
+			string pdfFilename, 
+			string logFilename, 
 			bool compressHistory)
 		{
-			Dictionary<string, string> DecorateDictionary = new Dictionary<string, string>();
-			List<List<string>> Nodes = new List<List<string>>();
+			Dictionary<string, string> decorateDictionary = new Dictionary<string, string>();
+			List<List<string>> nodes = new List<List<string>>();
 		
-			string Result;
-			string[] MergedColumns;
-			string[] MergedParents;
+			string result;
+			string[] mergedColumns;
+			string[] mergedParents;
 
 			this.OnStatusUpdated("Getting git commit(s) ...");
-			Result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --all --pretty=format:\"%h|%p|%d\"");
-			if (String.IsNullOrEmpty(Result))
-			{
+			result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --all --pretty=format:\"%h|%p|%d\"");
+			if (String.IsNullOrEmpty(result))
 				this.OnStatusUpdated("Unable to get get branch or branch empty ...");
-			}
 			else
 			{
-				File.AppendAllText(LogFilename, "[commit(s)]\r\n");
-				File.AppendAllText(LogFilename, Result + "\r\n");
-				string[] DecorateLines = Result.Split('\n');
-				foreach (string DecorateLine in DecorateLines)
+				File.AppendAllText(logFilename, "[commit(s)]\r\n");
+				File.AppendAllText(logFilename, result + "\r\n");
+				string[] decorateLines = result.Split('\n');
+				foreach (string decorateLine in decorateLines)
 				{
-					MergedColumns = DecorateLine.Split('|');
-					if (!String.IsNullOrEmpty(MergedColumns[2]))
+					mergedColumns = decorateLine.Split('|');
+					if (!String.IsNullOrEmpty(mergedColumns[2]))
 					{
-						DecorateDictionary.Add(MergedColumns[0], MergedColumns[2]);
+						decorateDictionary.Add(mergedColumns[0], mergedColumns[2]);
 					}
 				}
-				this.OnStatusUpdated("Processed " + DecorateDictionary.Count + " decorate(s) ...");
+				this.OnStatusUpdated("Processed " + decorateDictionary.Count + " decorate(s) ...");
 			}
 
 			this.OnStatusUpdated("Getting git ref branch(es) ...");
-			Result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" for-each-ref --format=\"%(objectname:short)|%(refname:short)\" "); //refs/heads/
-			if (String.IsNullOrEmpty(Result))
+			result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" for-each-ref --format=\"%(objectname:short)|%(refname:short)\" "); //refs/heads/
+			if (String.IsNullOrEmpty(result))
 			{
 				this.OnStatusUpdated("Unable to get get branch or branch empty ...");
 			}
 			else
 			{
-				File.AppendAllText(LogFilename, "[ref branch(es)]\r\n");
-				File.AppendAllText(LogFilename, Result + "\r\n");
-				string[] RefLines = Result.Split('\n');
-				foreach (string RefLine in RefLines)
+				File.AppendAllText(logFilename, "[ref branch(es)]\r\n");
+				File.AppendAllText(logFilename, result + "\r\n");
+				string[] refLines = result.Split('\n');
+				foreach (string refLine in refLines)
 				{
-					if (!String.IsNullOrEmpty(RefLine))
+					if (!String.IsNullOrEmpty(refLine))
 					{
-						string[] RefColumns = RefLine.Split('|');
-						if (!RefColumns[1].ToLower().StartsWith("refs/tags"))
-							if (RefColumns[1].ToLower().Contains("master"))
+						string[] refColumns = refLine.Split('|');
+						if (!refColumns[1].ToLower().StartsWith("refs/tags"))
+							if (refColumns[1].ToLower().Contains("master"))
 							{
-								Result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --reverse --first-parent --pretty=format:\"%h\" " + RefColumns[0]);
-								if (String.IsNullOrEmpty(Result))
+								result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --reverse --first-parent --pretty=format:\"%h\" " + refColumns[0]);
+								if (String.IsNullOrEmpty(result))
 								{
 									this.OnStatusUpdated("Unable to get commit(s) ...");
 								}
 								else
 								{
-									string[] HashLines = Result.Split('\n');
-									Nodes.Add(new List<string>());
-									foreach (string HashLine in HashLines)
+									string[] hashLines = result.Split('\n');
+									nodes.Add(new List<string>());
+									foreach (string hashLine in hashLines)
 									{
-										Nodes[Nodes.Count - 1].Add(HashLine);
+										nodes[nodes.Count - 1].Add(hashLine);
 									}
 								}
 							}
 					}
 				}
-				foreach (string RefLine in RefLines)
+				foreach (string refLine in refLines)
 				{
-					if (!String.IsNullOrEmpty(RefLine))
+					if (!String.IsNullOrEmpty(refLine))
 					{
-						string[] RefColumns = RefLine.Split('|');
-						if (!RefColumns[1].ToLower().StartsWith("refs/tags"))
-							if (!RefColumns[1].ToLower().Contains("master"))
+						string[] refColumns = refLine.Split('|');
+						if (!refColumns[1].ToLower().StartsWith("refs/tags"))
+							if (!refColumns[1].ToLower().Contains("master"))
 							{
-								Result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --reverse --first-parent --pretty=format:\"%h\" " + RefColumns[0]);
-								if (String.IsNullOrEmpty(Result))
+								result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --reverse --first-parent --pretty=format:\"%h\" " + refColumns[0]);
+								if (String.IsNullOrEmpty(result))
 								{
 									this.OnStatusUpdated("Unable to get commit(s) ...");
 								}
 								else
 								{
-									string[] HashLines = Result.Split('\n');
-									Nodes.Add(new List<string>());
-									foreach (string HashLine in HashLines)
+									string[] hashLines = result.Split('\n');
+									nodes.Add(new List<string>());
+									foreach (string hashLine in hashLines)
 									{
-										Nodes[Nodes.Count - 1].Add(HashLine);
+										nodes[nodes.Count - 1].Add(hashLine);
 									}
 								}
 							}
@@ -146,38 +140,38 @@ namespace GitVersionTree.Services
 			}
 
 			this.OnStatusUpdated("Getting git merged branch(es) ...");
-			Result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --all --merges --pretty=format:\"%h|%p\"");
-			if (String.IsNullOrEmpty(Result))
+			result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --all --merges --pretty=format:\"%h|%p\"");
+			if (String.IsNullOrEmpty(result))
 			{
 				this.OnStatusUpdated("Unable to get get branch or branch empty ...");
 			}
 			else
 			{
-				File.AppendAllText(LogFilename, "[merged branch(es)]\r\n");
-				File.AppendAllText(LogFilename, Result + "\r\n");
-				string[] MergedLines = Result.Split('\n');
-				foreach (string MergedLine in MergedLines)
+				File.AppendAllText(logFilename, "[merged branch(es)]\r\n");
+				File.AppendAllText(logFilename, result + "\r\n");
+				string[] mergedLines = result.Split('\n');
+				foreach (string mergedLine in mergedLines)
 				{
-					MergedColumns = MergedLine.Split('|');
-					MergedParents = MergedColumns[1].Split(' ');
-					if (MergedParents.Length > 1)
+					mergedColumns = mergedLine.Split('|');
+					mergedParents = mergedColumns[1].Split(' ');
+					if (mergedParents.Length > 1)
 					{
-						for (int i = 1; i < MergedParents.Length; i++)
+						for (int i = 1; i < mergedParents.Length; i++)
 						{
-							Result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --reverse --first-parent --pretty=format:\"%h\" " + MergedParents[i]);
-							if (String.IsNullOrEmpty(Result))
+							result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --reverse --first-parent --pretty=format:\"%h\" " + mergedParents[i]);
+							if (String.IsNullOrEmpty(result))
 							{
 								this.OnStatusUpdated("Unable to get commit(s) ...");
 							}
 							else
 							{
-								string[] HashLines = Result.Split('\n');
-								Nodes.Add(new List<string>());
-								foreach (string HashLine in HashLines)
+								string[] hashLines = result.Split('\n');
+								nodes.Add(new List<string>());
+								foreach (string hashLine in hashLines)
 								{
-									Nodes[Nodes.Count - 1].Add(HashLine);
+									nodes[nodes.Count - 1].Add(hashLine);
 								}
-								Nodes[Nodes.Count - 1].Add(MergedColumns[0]);
+								nodes[nodes.Count - 1].Add(mergedColumns[0]);
 							}
 						}
 					}
@@ -186,77 +180,77 @@ namespace GitVersionTree.Services
 
 			if (compressHistory)
 			{
-				Nodes = (from node in Nodes
+				nodes = (from node in nodes
 						 select node.Count > 2 ?
 									 (new List<string>(new[] { node[0], String.Format("{0} histories omitted", node.Count - 2), node[node.Count - 1] }))
 									 : node).ToList();
 			}
 
 
-			this.OnStatusUpdated("Processed " + Nodes.Count + " branch(es) ...");
+			this.OnStatusUpdated("Processed " + nodes.Count + " branch(es) ...");
 
-			StringBuilder DotStringBuilder = new StringBuilder();
+			StringBuilder dotStringBuilder = new StringBuilder();
 			this.OnStatusUpdated("Generating dot file ...");
-			DotStringBuilder.Append("strict digraph \"" + RepositoryName + "\" {\r\n");
+			dotStringBuilder.Append("strict digraph \"" + repositoryName + "\" {\r\n");
 			//DotStringBuilder.Append("  splines=line;\r\n");
-			for (int i = 0; i < Nodes.Count; i++)
+			for (int i = 0; i < nodes.Count; i++)
 			{
-				DotStringBuilder.Append("  node[group=\"" + (i + 1) + "\"];\r\n");
-				DotStringBuilder.Append("  ");
-				for (int j = 0; j < Nodes[i].Count; j++)
+				dotStringBuilder.Append("  node[group=\"" + (i + 1) + "\"];\r\n");
+				dotStringBuilder.Append("  ");
+				for (int j = 0; j < nodes[i].Count; j++)
 				{
-					DotStringBuilder.Append("\"" + Nodes[i][j] + "\"");
-					if (j < Nodes[i].Count - 1)
+					dotStringBuilder.Append("\"" + nodes[i][j] + "\"");
+					if (j < nodes[i].Count - 1)
 					{
-						DotStringBuilder.Append(" -> ");
+						dotStringBuilder.Append(" -> ");
 					}
 					else
 					{
-						DotStringBuilder.Append(";");
+						dotStringBuilder.Append(";");
 					}
 				}
-				DotStringBuilder.Append("\r\n");
+				dotStringBuilder.Append("\r\n");
 			}
 
-			int DecorateCount = 0;
-			foreach (KeyValuePair<string, string> DecorateKeyValuePair in DecorateDictionary)
+			int decorateCount = 0;
+			foreach (KeyValuePair<string, string> decorateKeyValuePair in decorateDictionary)
 			{
-				DecorateCount++;
-				DotStringBuilder.Append("  subgraph Decorate" + DecorateCount + "\r\n");
-				DotStringBuilder.Append("  {\r\n");
-				DotStringBuilder.Append("    rank=\"same\";\r\n");
-				if (DecorateKeyValuePair.Value.Trim().StartsWith("(tag:"))
+				decorateCount++;
+				dotStringBuilder.Append("  subgraph Decorate" + decorateCount + "\r\n");
+				dotStringBuilder.Append("  {\r\n");
+				dotStringBuilder.Append("    rank=\"same\";\r\n");
+				if (decorateKeyValuePair.Value.Trim().StartsWith("(tag:"))
 				{
-					DotStringBuilder.Append("    \"" + DecorateKeyValuePair.Value.Trim() + "\" [shape=\"box\", style=\"filled\", fillcolor=\"#ffffdd\"];\r\n");
+					dotStringBuilder.Append("    \"" + decorateKeyValuePair.Value.Trim() + "\" [shape=\"box\", style=\"filled\", fillcolor=\"#ffffdd\"];\r\n");
 				}
 				else
 				{
-					DotStringBuilder.Append("    \"" + DecorateKeyValuePair.Value.Trim() + "\" [shape=\"box\", style=\"filled\", fillcolor=\"#ddddff\"];\r\n");
+					dotStringBuilder.Append("    \"" + decorateKeyValuePair.Value.Trim() + "\" [shape=\"box\", style=\"filled\", fillcolor=\"#ddddff\"];\r\n");
 				}
-				DotStringBuilder.Append("    \"" + DecorateKeyValuePair.Value.Trim() + "\" -> \"" + DecorateKeyValuePair.Key + "\" [weight=0, arrowtype=\"none\", dirtype=\"none\", arrowhead=\"none\", style=\"dotted\"];\r\n");
-				DotStringBuilder.Append("  }\r\n");
+				dotStringBuilder.Append("    \"" + decorateKeyValuePair.Value.Trim() + "\" -> \"" + decorateKeyValuePair.Key + "\" [weight=0, arrowtype=\"none\", dirtype=\"none\", arrowhead=\"none\", style=\"dotted\"];\r\n");
+				dotStringBuilder.Append("  }\r\n");
 			}
 
-			DotStringBuilder.Append("}\r\n");
-			File.WriteAllText(@DotFilename, DotStringBuilder.ToString());
+			dotStringBuilder.Append("}\r\n");
+			File.WriteAllText(dotFilename, dotStringBuilder.ToString());
 
 			this.OnStatusUpdated("Generating version tree ...");
-			Process DotProcess = new Process();
-			DotProcess.StartInfo.UseShellExecute = false;
-			DotProcess.StartInfo.CreateNoWindow = true;
-			DotProcess.StartInfo.RedirectStandardOutput = true;
-			DotProcess.StartInfo.FileName = Properties.Settings.Default.GraphvizPath;
-			DotProcess.StartInfo.Arguments = "\"" + @DotFilename + "\" -Tpdf -Gsize=10,10 -o\"" + @PdfFilename + "\"";
-			DotProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-			DotProcess.Start();
-			DotProcess.WaitForExit();
+			Process dotProcess = new Process();
+			dotProcess.StartInfo.UseShellExecute = false;
+			dotProcess.StartInfo.CreateNoWindow = true;
+			dotProcess.StartInfo.RedirectStandardOutput = true;
+			dotProcess.StartInfo.FileName = Properties.Settings.Default.GraphvizPath;
+			dotProcess.StartInfo.Arguments = "\"" + dotFilename + "\" -Tpdf -Gsize=10,10 -o\"" + pdfFilename + "\"";
+			dotProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+			dotProcess.Start();
+			dotProcess.WaitForExit();
 
-			DotProcess.StartInfo.Arguments = "\"" + @DotFilename + "\" -Tps -o\"" + @PdfFilename.Replace(".pdf", ".ps") + "\"";
-			DotProcess.Start();
-			DotProcess.WaitForExit();
-			if (DotProcess.ExitCode == 0)
+			dotProcess.StartInfo.Arguments = "\"" + dotFilename + "\" -Tps -o\"" + pdfFilename.Replace(".pdf", ".ps") + "\"";
+			dotProcess.Start();
+			dotProcess.WaitForExit();
+			if (dotProcess.ExitCode == 0)
 			{
-				if (File.Exists(@PdfFilename))
+				if (File.Exists(pdfFilename))
 				{
 #if (!DEBUG)
 					/*
@@ -270,9 +264,7 @@ namespace GitVersionTree.Services
 				}
 			}
 			else
-			{
 				this.OnStatusUpdated("Version tree generation failed ...");
-			}
 
 			this.OnStatusUpdated("Done! ...");
 		}
