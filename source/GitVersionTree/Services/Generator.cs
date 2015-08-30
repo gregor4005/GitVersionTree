@@ -10,6 +10,14 @@ using GitVersionTree.Utils;
 
 namespace GitVersionTree.Services
 {
+	public enum OutputFormats
+	{
+		PDF,
+		EPS,
+		SVG,
+		Jpg
+	}
+	//-------------------------------------------------------------------------
 	public class Generator
 	{
 		public event EventHandler<StatusEventArgs> StatusUpdated;
@@ -20,10 +28,9 @@ namespace GitVersionTree.Services
 				tmp(this, new StatusEventArgs(message));
 		}
 		//---------------------------------------------------------------------
-		public void Generate(string repositoryName, bool compressHistory)
+		public void Generate(string repositoryName, OutputFormats outputFormat, bool compressHistory)
 		{
 			string dotFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + ".dot");
-			string pdfFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + ".pdf");
 			string logFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + ".log");
 
 			File.WriteAllText(logFilename, "");
@@ -168,48 +175,8 @@ namespace GitVersionTree.Services
 
 			this.OnStatusUpdated("Processed " + nodes.Count + " branch(es) ...");
 
-			GenerateDotFile(repositoryName, dotFilename, decorateDictionary, nodes);
-
-			this.OnStatusUpdated("Generating version tree ...");
-			Process dotProcess = new Process();
-			dotProcess.StartInfo.UseShellExecute = false;
-			dotProcess.StartInfo.CreateNoWindow = true;
-			dotProcess.StartInfo.RedirectStandardOutput = true;
-			dotProcess.StartInfo.FileName = Properties.Settings.Default.GraphvizPath;
-			dotProcess.StartInfo.Arguments = "\"" + dotFilename + "\" -Tpdf -Gsize=10,10 -o\"" + pdfFilename + "\"";
-			dotProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-			dotProcess.Start();
-			dotProcess.WaitForExit();
-
-			dotProcess.StartInfo.Arguments = "\"" + dotFilename + "\" -Tps -o\"" + pdfFilename.Replace(".pdf", ".ps") + "\"";
-			dotProcess.Start();
-			dotProcess.WaitForExit();
-
-			dotProcess.StartInfo.Arguments = "\"" + dotFilename + "\" -Tsvg -o\"" + pdfFilename.Replace(".pdf", ".svg") + "\"";
-			dotProcess.Start();
-			dotProcess.WaitForExit();
-
-			dotProcess.StartInfo.Arguments = "\"" + dotFilename + "\" -Tjpg -o\"" + pdfFilename.Replace(".pdf", ".jpg") + "\"";
-			dotProcess.Start();
-			dotProcess.WaitForExit();
-
-			if (dotProcess.ExitCode == 0)
-			{
-				if (File.Exists(pdfFilename))
-				{
-#if (!DEBUG)
-					/*
-					Process ViewPdfProcess = new Process();
-					ViewPdfProcess.StartInfo.FileName = @PdfFilename;
-					ViewPdfProcess.Start();
-					//ViewPdfProcess.WaitForExit();
-					//Close();
-					*/
-#endif
-				}
-			}
-			else
-				this.OnStatusUpdated("Version tree generation failed ...");
+			this.GenerateDotFile(repositoryName, dotFilename, decorateDictionary, nodes);
+			this.GenerateOutput(repositoryName, dotFilename, outputFormat);
 
 			this.OnStatusUpdated("Done! ...");
 		}
@@ -238,9 +205,9 @@ namespace GitVersionTree.Services
 		}
 		//---------------------------------------------------------------------
 		private void GenerateDotFile(
-			string repositoryName, 
-			string dotFilename, 
-			Dictionary<string, string> decorateDictionary, 
+			string repositoryName,
+			string dotFilename,
+			Dictionary<string, string> decorateDictionary,
 			List<List<string>> nodes)
 		{
 			StringBuilder dotStringBuilder = new StringBuilder();
@@ -269,12 +236,12 @@ namespace GitVersionTree.Services
 				dotStringBuilder.Append("  subgraph Decorate" + decorateCount + "\r\n");
 				dotStringBuilder.Append("  {\r\n");
 				dotStringBuilder.Append("    rank=\"same\";\r\n");
-				
+
 				if (decorateKeyValuePair.Value.Trim().StartsWith("(tag:"))
 					dotStringBuilder.Append("    \"" + decorateKeyValuePair.Value.Trim() + "\" [shape=\"box\", style=\"filled\", fillcolor=\"#ffffdd\"];\r\n");
 				else
 					dotStringBuilder.Append("    \"" + decorateKeyValuePair.Value.Trim() + "\" [shape=\"box\", style=\"filled\", fillcolor=\"#ddddff\"];\r\n");
-				
+
 				dotStringBuilder.Append("    \"" + decorateKeyValuePair.Value.Trim() + "\" -> \"" + decorateKeyValuePair.Key + "\" [weight=0, arrowtype=\"none\", dirtype=\"none\", arrowhead=\"none\", style=\"dotted\"];\r\n");
 				dotStringBuilder.Append("  }\r\n");
 			}
@@ -282,6 +249,49 @@ namespace GitVersionTree.Services
 			dotStringBuilder.Append("}\r\n");
 
 			File.WriteAllText(dotFilename, dotStringBuilder.ToString());
+		}
+		//---------------------------------------------------------------------
+		private void GenerateOutput(string repositoryName, string dotFilename, OutputFormats outputFormat)
+		{
+			this.OnStatusUpdated("Generating version tree ...");
+
+			string extension = outputFormat.ToString().ToLower();
+			
+			string outputFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + "." + extension);
+			string arguments = "\"" + dotFilename + "\" -Tpdf -Gsize=10,10 -o\"" + outputFilename + "\"";
+			
+			arguments = arguments.Replace("-Tpdf", "-T" + extension);
+
+			if (outputFormat != OutputFormats.PDF)
+				arguments = arguments.Replace("-Gsize=10,10 ", string.Empty);
+			
+			Process dotProcess = new Process();
+			dotProcess.StartInfo.UseShellExecute = false;
+			dotProcess.StartInfo.CreateNoWindow = true;
+			dotProcess.StartInfo.RedirectStandardOutput = true;
+			dotProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+			dotProcess.StartInfo.FileName = Properties.Settings.Default.GraphvizPath;
+			dotProcess.StartInfo.Arguments = arguments;			
+			dotProcess.Start();
+			dotProcess.WaitForExit();
+
+			if (dotProcess.ExitCode == 0)
+			{
+				if (File.Exists(outputFilename))
+				{
+#if (!DEBUG)
+					/*
+					Process ViewPdfProcess = new Process();
+					ViewPdfProcess.StartInfo.FileName = @PdfFilename;
+					ViewPdfProcess.Start();
+					//ViewPdfProcess.WaitForExit();
+					//Close();
+					*/
+#endif
+				}
+			}
+			else
+				this.OnStatusUpdated("Version tree generation failed ...");
 		}
 	}
 }

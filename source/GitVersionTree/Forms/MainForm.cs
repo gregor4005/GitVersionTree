@@ -90,7 +90,7 @@ namespace GitVersionTree
 
 			StatusRichTextBox.Text = "";
 			string repositoryName = new DirectoryInfo(GitRepositoryPathTextBox.Text).Name;
-			_generator.Generate(repositoryName, IsCompressHistoryCheckBox.Checked);
+			_generator.Generate(repositoryName, OutputFormats.PDF, IsCompressHistoryCheckBox.Checked);
 		}
 		//---------------------------------------------------------------------
 		private void HomepageLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
