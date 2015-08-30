@@ -99,7 +99,7 @@ namespace GitVersionTree
 		//---------------------------------------------------------------------
 		private void HomepageLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			Process.Start("https://github.com/crc8/GitVersionTree");
+			Process.Start("https://github.com/gfoidl/GitVersionTree");
 		}
 		//---------------------------------------------------------------------
 		private void ExitButton_Click(object sender, EventArgs e)
