@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using GitVersionTree.Services;
 
 namespace GitVersionTree
 {
@@ -38,6 +39,11 @@ namespace GitVersionTree
 		private static void RunAsCommandLine(string[] args)
 		{
 			AllocConsole();
+
+			Generator generator = new Generator();
+			generator.StatusUpdated += (s, e) => Console.WriteLine(e.Message);
+
+			generator.Generate(args[0], args[1]);
 
 			Console.WriteLine("\nBye.");
 
