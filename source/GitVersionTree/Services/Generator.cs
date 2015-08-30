@@ -10,7 +10,7 @@ using GitVersionTree.Utils;
 
 namespace GitVersionTree.Services
 {
-	public	class Generator
+	public class Generator
 	{
 		public event EventHandler<StatusEventArgs> StatusUpdated;
 		private void OnStatusUpdated(string message)
@@ -43,17 +43,17 @@ namespace GitVersionTree.Services
 				return String.Empty;
 		}
 		//---------------------------------------------------------------------
-		public void Generate(string repositoryName,bool compressHistory)
+		public void Generate(string repositoryName, bool compressHistory)
 		{
 			string dotFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + ".dot");
 			string pdfFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + ".pdf");
 			string logFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + ".log");
-			
+
 			File.WriteAllText(logFilename, "");
-			
+
 			Dictionary<string, string> decorateDictionary = new Dictionary<string, string>();
 			List<List<string>> nodes = new List<List<string>>();
-		
+
 			string result;
 			string[] mergedColumns;
 			string[] mergedParents;
@@ -191,50 +191,7 @@ namespace GitVersionTree.Services
 
 			this.OnStatusUpdated("Processed " + nodes.Count + " branch(es) ...");
 
-			StringBuilder dotStringBuilder = new StringBuilder();
-			this.OnStatusUpdated("Generating dot file ...");
-			dotStringBuilder.Append("strict digraph \"" + repositoryName + "\" {\r\n");
-			//DotStringBuilder.Append("  splines=line;\r\n");
-			for (int i = 0; i < nodes.Count; i++)
-			{
-				dotStringBuilder.Append("  node[group=\"" + (i + 1) + "\"];\r\n");
-				dotStringBuilder.Append("  ");
-				for (int j = 0; j < nodes[i].Count; j++)
-				{
-					dotStringBuilder.Append("\"" + nodes[i][j] + "\"");
-					if (j < nodes[i].Count - 1)
-					{
-						dotStringBuilder.Append(" -> ");
-					}
-					else
-					{
-						dotStringBuilder.Append(";");
-					}
-				}
-				dotStringBuilder.Append("\r\n");
-			}
-
-			int decorateCount = 0;
-			foreach (KeyValuePair<string, string> decorateKeyValuePair in decorateDictionary)
-			{
-				decorateCount++;
-				dotStringBuilder.Append("  subgraph Decorate" + decorateCount + "\r\n");
-				dotStringBuilder.Append("  {\r\n");
-				dotStringBuilder.Append("    rank=\"same\";\r\n");
-				if (decorateKeyValuePair.Value.Trim().StartsWith("(tag:"))
-				{
-					dotStringBuilder.Append("    \"" + decorateKeyValuePair.Value.Trim() + "\" [shape=\"box\", style=\"filled\", fillcolor=\"#ffffdd\"];\r\n");
-				}
-				else
-				{
-					dotStringBuilder.Append("    \"" + decorateKeyValuePair.Value.Trim() + "\" [shape=\"box\", style=\"filled\", fillcolor=\"#ddddff\"];\r\n");
-				}
-				dotStringBuilder.Append("    \"" + decorateKeyValuePair.Value.Trim() + "\" -> \"" + decorateKeyValuePair.Key + "\" [weight=0, arrowtype=\"none\", dirtype=\"none\", arrowhead=\"none\", style=\"dotted\"];\r\n");
-				dotStringBuilder.Append("  }\r\n");
-			}
-
-			dotStringBuilder.Append("}\r\n");
-			File.WriteAllText(dotFilename, dotStringBuilder.ToString());
+			GenerateDotFile(repositoryName, dotFilename, decorateDictionary, nodes);
 
 			this.OnStatusUpdated("Generating version tree ...");
 			Process dotProcess = new Process();
@@ -269,6 +226,53 @@ namespace GitVersionTree.Services
 				this.OnStatusUpdated("Version tree generation failed ...");
 
 			this.OnStatusUpdated("Done! ...");
+		}
+		//---------------------------------------------------------------------
+		private void GenerateDotFile(
+			string repositoryName, 
+			string dotFilename, 
+			Dictionary<string, string> decorateDictionary, 
+			List<List<string>> nodes)
+		{
+			StringBuilder dotStringBuilder = new StringBuilder();
+			this.OnStatusUpdated("Generating dot file ...");
+			dotStringBuilder.Append("strict digraph \"" + repositoryName + "\" {\r\n");
+			//dotStringBuilder.Append("  splines=line;\r\n");
+			for (int i = 0; i < nodes.Count; i++)
+			{
+				dotStringBuilder.Append("  node[group=\"" + (i + 1) + "\"];\r\n");
+				dotStringBuilder.Append("  ");
+				for (int j = 0; j < nodes[i].Count; j++)
+				{
+					dotStringBuilder.Append("\"" + nodes[i][j] + "\"");
+					if (j < nodes[i].Count - 1)
+						dotStringBuilder.Append(" -> ");
+					else
+						dotStringBuilder.Append(";");
+				}
+				dotStringBuilder.Append("\r\n");
+			}
+
+			int decorateCount = 0;
+			foreach (KeyValuePair<string, string> decorateKeyValuePair in decorateDictionary)
+			{
+				decorateCount++;
+				dotStringBuilder.Append("  subgraph Decorate" + decorateCount + "\r\n");
+				dotStringBuilder.Append("  {\r\n");
+				dotStringBuilder.Append("    rank=\"same\";\r\n");
+				
+				if (decorateKeyValuePair.Value.Trim().StartsWith("(tag:"))
+					dotStringBuilder.Append("    \"" + decorateKeyValuePair.Value.Trim() + "\" [shape=\"box\", style=\"filled\", fillcolor=\"#ffffdd\"];\r\n");
+				else
+					dotStringBuilder.Append("    \"" + decorateKeyValuePair.Value.Trim() + "\" [shape=\"box\", style=\"filled\", fillcolor=\"#ddddff\"];\r\n");
+				
+				dotStringBuilder.Append("    \"" + decorateKeyValuePair.Value.Trim() + "\" -> \"" + decorateKeyValuePair.Key + "\" [weight=0, arrowtype=\"none\", dirtype=\"none\", arrowhead=\"none\", style=\"dotted\"];\r\n");
+				dotStringBuilder.Append("  }\r\n");
+			}
+
+			dotStringBuilder.Append("}\r\n");
+
+			File.WriteAllText(dotFilename, dotStringBuilder.ToString());
 		}
 	}
 }
