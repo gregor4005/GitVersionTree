@@ -207,6 +207,15 @@ namespace GitVersionTree.Services
 			dotProcess.StartInfo.Arguments = "\"" + dotFilename + "\" -Tps -o\"" + pdfFilename.Replace(".pdf", ".ps") + "\"";
 			dotProcess.Start();
 			dotProcess.WaitForExit();
+
+			dotProcess.StartInfo.Arguments = "\"" + dotFilename + "\" -Tsvg -o\"" + pdfFilename.Replace(".pdf", ".svg") + "\"";
+			dotProcess.Start();
+			dotProcess.WaitForExit();
+
+			dotProcess.StartInfo.Arguments = "\"" + dotFilename + "\" -Tjpg -o\"" + pdfFilename.Replace(".pdf", ".jpg") + "\"";
+			dotProcess.Start();
+			dotProcess.WaitForExit();
+
 			if (dotProcess.ExitCode == 0)
 			{
 				if (File.Exists(pdfFilename))
