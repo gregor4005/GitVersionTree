@@ -8,21 +8,19 @@ namespace GitVersionTree
 {
 	public partial class MainForm : Form
 	{
-		private string _dotFilename;
-		private string _pdfFilename;
-		private string _logFilename;
-		private string _repositoryName;
 		private Generator _generator = new Generator();
 		//---------------------------------------------------------------------
 		public MainForm()
 		{
 			InitializeComponent();
+			outputFormatListBox.DataSource = Enum.GetNames(typeof(OutputFormat));
+
 			_generator.StatusUpdated += Generator_StatusUpdated;
 		}
 		//---------------------------------------------------------------------
 		private void MainForm_Load(object sender, EventArgs e)
 		{
-			Text = Application.ProductName + " - v" + Application.ProductVersion.Substring(0, 3);
+			this.Text = Application.ProductName + " - v" + Application.ProductVersion.Substring(0, 3);
 
 			this.RefreshPath();
 		}
@@ -92,18 +90,16 @@ namespace GitVersionTree
 				return;
 			}
 
+			OutputFormat outputFormat = (OutputFormat)Enum.Parse(typeof(OutputFormat), outputFormatListBox.SelectedItem as string);
+
 			StatusRichTextBox.Text = "";
-			_repositoryName = new DirectoryInfo(GitRepositoryPathTextBox.Text).Name;
-			_dotFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), _repositoryName + ".dot");
-			_pdfFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), _repositoryName + ".pdf");
-			_logFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), _repositoryName + ".log");
-			File.WriteAllText(_logFilename, "");
-			_generator.Generate(_repositoryName, _dotFilename, _pdfFilename, _logFilename, IsCompressHistoryCheckBox.Checked);
+			string repositoryName = new DirectoryInfo(GitRepositoryPathTextBox.Text).Name;
+			_generator.Generate(repositoryName, outputFormat, IsCompressHistoryCheckBox.Checked);
 		}
 		//---------------------------------------------------------------------
 		private void HomepageLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			Process.Start("https://github.com/crc8/GitVersionTree");
+			Process.Start("https://github.com/gfoidl/GitVersionTree");
 		}
 		//---------------------------------------------------------------------
 		private void ExitButton_Click(object sender, EventArgs e)
