@@ -4,13 +4,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using GitVersionTree.Utils;
 
 namespace GitVersionTree.Services
 {
-	public enum OutputFormats
+	public enum OutputFormat
 	{
 		PDF,
 		EPS,
@@ -28,7 +27,7 @@ namespace GitVersionTree.Services
 				tmp(this, new StatusEventArgs(message));
 		}
 		//---------------------------------------------------------------------
-		public void Generate(string repositoryName, OutputFormats outputFormat, bool compressHistory)
+		public void Generate(string repositoryName, OutputFormat outputFormat, bool compressHistory)
 		{
 			string dotFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + ".dot");
 
@@ -257,7 +256,7 @@ namespace GitVersionTree.Services
 			File.WriteAllText(dotFilename, dotStringBuilder.ToString());
 		}
 		//---------------------------------------------------------------------
-		private void GenerateOutput(string repositoryName, string dotFilename, OutputFormats outputFormat)
+		private void GenerateOutput(string repositoryName, string dotFilename, OutputFormat outputFormat)
 		{
 			this.OnStatusUpdated("Generating version tree ...");
 
@@ -268,7 +267,7 @@ namespace GitVersionTree.Services
 
 			arguments = arguments.Replace("-Tpdf", "-T" + extension);
 
-			if (outputFormat != OutputFormats.PDF)
+			if (outputFormat != OutputFormat.PDF)
 				arguments = arguments.Replace("-Gsize=10,10 ", string.Empty);
 
 			Process dotProcess = new Process();

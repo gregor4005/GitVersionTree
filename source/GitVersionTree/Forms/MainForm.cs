@@ -18,7 +18,7 @@ namespace GitVersionTree
 		//---------------------------------------------------------------------
 		private void MainForm_Load(object sender, EventArgs e)
 		{
-			Text = Application.ProductName + " - v" + Application.ProductVersion.Substring(0, 3);
+			this.Text = Application.ProductName + " - v" + Application.ProductVersion.Substring(0, 3);
 
 			this.RefreshPath();
 		}
@@ -90,7 +90,7 @@ namespace GitVersionTree
 
 			StatusRichTextBox.Text = "";
 			string repositoryName = new DirectoryInfo(GitRepositoryPathTextBox.Text).Name;
-			_generator.Generate(repositoryName, OutputFormats.PDF, IsCompressHistoryCheckBox.Checked);
+			_generator.Generate(repositoryName, OutputFormat.PDF, IsCompressHistoryCheckBox.Checked);
 		}
 		//---------------------------------------------------------------------
 		private void HomepageLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
