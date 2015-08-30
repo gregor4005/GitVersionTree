@@ -9,14 +9,6 @@ using GitVersionTree.Utils;
 
 namespace GitVersionTree.Services
 {
-	public enum OutputFormat
-	{
-		PDF,
-		EPS,
-		SVG,
-		Jpg
-	}
-	//-------------------------------------------------------------------------
 	public class Generator
 	{
 		public event EventHandler<StatusEventArgs> StatusUpdated;
