@@ -13,6 +13,8 @@ namespace GitVersionTree
 		public MainForm()
 		{
 			InitializeComponent();
+			outputFormatListBox.DataSource = Enum.GetNames(typeof(OutputFormat));
+
 			_generator.StatusUpdated += Generator_StatusUpdated;
 		}
 		//---------------------------------------------------------------------
@@ -88,9 +90,11 @@ namespace GitVersionTree
 				return;
 			}
 
+			OutputFormat outputFormat = (OutputFormat)Enum.Parse(typeof(OutputFormat), outputFormatListBox.SelectedItem as string);
+
 			StatusRichTextBox.Text = "";
 			string repositoryName = new DirectoryInfo(GitRepositoryPathTextBox.Text).Name;
-			_generator.Generate(repositoryName, OutputFormat.PDF, IsCompressHistoryCheckBox.Checked);
+			_generator.Generate(repositoryName, outputFormat, IsCompressHistoryCheckBox.Checked);
 		}
 		//---------------------------------------------------------------------
 		private void HomepageLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
