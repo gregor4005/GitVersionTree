@@ -33,6 +33,7 @@ Features
 - Date is sort on the branch itself instead with all branch
 - Tag and branch name on the side
 - Easy scrolling / zooming with PDF
+- different output-formats (PDF, EPS, SVG, Jpg)
 
 Project Status
 --------------
@@ -41,7 +42,7 @@ Project Status
 - Contructive feedback are always welcome.
 - Good to handle git project with less than 500 commits. Should be able to visualize clearly.
 - Tested with jquery project with 5000+ commits. Although the tool still can generate the version tree, but you wouldn't want to go thru each commits, only to visualize some development of the important branch only.
-- Will generate out a `.pdf` file, a `.dot` file and a `.ps` file. So you can either view PDF with PDF reader, or Dot file with zgrviewer, or Postscript file with Evince.
+- Will generate out a `.dot` file and a `.pdf|.eps|.svg|.jpg` file. So you can either view the files with any installed viewer, or Dot file with zgrviewer.
 
 Requirement
 -----------
@@ -51,10 +52,8 @@ This tool required or need:
 - [Git](http://git-scm.com/)
 - [Graphviz](http://www.graphviz.org/)
 - [Microsoft(c) .Net Framework 4.0](http://www.microsoft.com/en-us/download/details.aspx?id=17718)
-- [Any PDF reader/viewer](http://get.adobe.com/reader/)
-- [Postscript viewer](https://projects.gnome.org/evince/) (optional)
 
-This project was compile using Microsoft(c) Visual Studio 2010 Express Edition.
+This project was compile using Microsoft(c) Visual Studio 2012 Ultimate Edition.
 
 Pending
 -------
@@ -71,11 +70,15 @@ Download
 --------
 
 Latest release:
-[v1.0](https://github.com/crc8/GitVersionTree/releases)
+
+[v1.1](https://github.com/gfoidl/GitVersionTree/releases)
 
 Changelog
 ---------
 
+- v1.1 - 30. August 2015
+    - different output-formats
+    
 - v1.0 - 17 August 2013
 
 	- Initial baseline
