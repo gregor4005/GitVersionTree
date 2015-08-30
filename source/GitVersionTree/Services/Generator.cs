@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using GitVersionTree.Utils;
 
 namespace GitVersionTree.Services
@@ -42,13 +43,14 @@ namespace GitVersionTree.Services
 				return String.Empty;
 		}
 		//---------------------------------------------------------------------
-		public void Generate(
-			string repositoryName,
-			string dotFilename, 
-			string pdfFilename, 
-			string logFilename, 
-			bool compressHistory)
+		public void Generate(string repositoryName,bool compressHistory)
 		{
+			string dotFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + ".dot");
+			string pdfFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + ".pdf");
+			string logFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + ".log");
+			
+			File.WriteAllText(logFilename, "");
+			
 			Dictionary<string, string> decorateDictionary = new Dictionary<string, string>();
 			List<List<string>> nodes = new List<List<string>>();
 		

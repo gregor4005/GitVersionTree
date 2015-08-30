@@ -8,10 +8,6 @@ namespace GitVersionTree
 {
 	public partial class MainForm : Form
 	{
-		private string _dotFilename;
-		private string _pdfFilename;
-		private string _logFilename;
-		private string _repositoryName;
 		private Generator _generator = new Generator();
 		//---------------------------------------------------------------------
 		public MainForm()
@@ -93,12 +89,8 @@ namespace GitVersionTree
 			}
 
 			StatusRichTextBox.Text = "";
-			_repositoryName = new DirectoryInfo(GitRepositoryPathTextBox.Text).Name;
-			_dotFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), _repositoryName + ".dot");
-			_pdfFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), _repositoryName + ".pdf");
-			_logFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), _repositoryName + ".log");
-			File.WriteAllText(_logFilename, "");
-			_generator.Generate(_repositoryName, _dotFilename, _pdfFilename, _logFilename, IsCompressHistoryCheckBox.Checked);
+			string repositoryName = new DirectoryInfo(GitRepositoryPathTextBox.Text).Name;
+			_generator.Generate(repositoryName, IsCompressHistoryCheckBox.Checked);
 		}
 		//---------------------------------------------------------------------
 		private void HomepageLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
