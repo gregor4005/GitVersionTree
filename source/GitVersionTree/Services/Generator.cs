@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using GitVersionTree.Utils;
 
@@ -20,47 +19,36 @@ namespace GitVersionTree.Services
 				tmp(this, new StatusEventArgs(message));
 		}
 		//---------------------------------------------------------------------
-		private static string Execute(string command, string argument)
-		{
-			string executeResult = String.Empty;
-
-			Process executeProcess = new Process();
-
-			executeProcess.StartInfo.UseShellExecute 		= false;
-			executeProcess.StartInfo.CreateNoWindow 		= true;
-			executeProcess.StartInfo.RedirectStandardOutput = true;
-			executeProcess.StartInfo.FileName 				= command;
-			executeProcess.StartInfo.Arguments 				= argument;
-			executeProcess.StartInfo.WindowStyle 			= ProcessWindowStyle.Hidden;
-
-			executeProcess.Start();
-			executeResult = executeProcess.StandardOutput.ReadToEnd();
-			executeProcess.WaitForExit();
-
-			if (executeProcess.ExitCode == 0)
-				return executeResult;
-			else
-				return String.Empty;
-		}
-		//---------------------------------------------------------------------
-		public void Generate(string repositoryName, bool compressHistory)
+		public void Generate(string repositoryName, OutputFormat outputFormat, bool compressHistory)
 		{
 			string dotFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + ".dot");
-			string pdfFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + ".pdf");
-			string logFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + ".log");
-
-			File.WriteAllText(logFilename, "");
 
 			Dictionary<string, string> decorateDictionary = new Dictionary<string, string>();
 			List<List<string>> nodes = new List<List<string>>();
 
-			string result;
+			this.GetGitCommits(repositoryName, decorateDictionary, nodes, compressHistory);
+			this.GenerateDotFile(repositoryName, dotFilename, decorateDictionary, nodes);
+			this.GenerateOutput(repositoryName, dotFilename, outputFormat);
+
+			this.OnStatusUpdated("Done! ...");
+		}
+		//---------------------------------------------------------------------
+		private void GetGitCommits(
+			string repositoryName,
+			Dictionary<string, string> decorateDictionary,
+			List<List<string>> nodes,
+			bool compressHistory)
+		{
+			string logFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + ".log");
+			File.WriteAllText(logFilename, "");
+
 			string[] mergedColumns;
 			string[] mergedParents;
 
 			this.OnStatusUpdated("Getting git commit(s) ...");
-			result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --all --pretty=format:\"%h|%p|%d\"");
-			if (String.IsNullOrEmpty(result))
+			string result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --all --pretty=format:\"%h|%p|%d\"");
+
+			if (string.IsNullOrEmpty(result))
 				this.OnStatusUpdated("Unable to get get branch or branch empty ...");
 			else
 			{
@@ -70,7 +58,7 @@ namespace GitVersionTree.Services
 				foreach (string decorateLine in decorateLines)
 				{
 					mergedColumns = decorateLine.Split('|');
-					if (!String.IsNullOrEmpty(mergedColumns[2]))
+					if (!string.IsNullOrEmpty(mergedColumns[2]))
 					{
 						decorateDictionary.Add(mergedColumns[0], mergedColumns[2]);
 					}
@@ -80,10 +68,9 @@ namespace GitVersionTree.Services
 
 			this.OnStatusUpdated("Getting git ref branch(es) ...");
 			result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" for-each-ref --format=\"%(objectname:short)|%(refname:short)\" "); //refs/heads/
-			if (String.IsNullOrEmpty(result))
-			{
+
+			if (string.IsNullOrEmpty(result))
 				this.OnStatusUpdated("Unable to get get branch or branch empty ...");
-			}
 			else
 			{
 				File.AppendAllText(logFilename, "[ref branch(es)]\r\n");
@@ -91,14 +78,14 @@ namespace GitVersionTree.Services
 				string[] refLines = result.Split('\n');
 				foreach (string refLine in refLines)
 				{
-					if (!String.IsNullOrEmpty(refLine))
+					if (!string.IsNullOrEmpty(refLine))
 					{
 						string[] refColumns = refLine.Split('|');
 						if (!refColumns[1].ToLower().StartsWith("refs/tags"))
 							if (refColumns[1].ToLower().Contains("master"))
 							{
 								result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --reverse --first-parent --pretty=format:\"%h\" " + refColumns[0]);
-								if (String.IsNullOrEmpty(result))
+								if (string.IsNullOrEmpty(result))
 								{
 									this.OnStatusUpdated("Unable to get commit(s) ...");
 								}
@@ -116,14 +103,14 @@ namespace GitVersionTree.Services
 				}
 				foreach (string refLine in refLines)
 				{
-					if (!String.IsNullOrEmpty(refLine))
+					if (!string.IsNullOrEmpty(refLine))
 					{
 						string[] refColumns = refLine.Split('|');
 						if (!refColumns[1].ToLower().StartsWith("refs/tags"))
 							if (!refColumns[1].ToLower().Contains("master"))
 							{
 								result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --reverse --first-parent --pretty=format:\"%h\" " + refColumns[0]);
-								if (String.IsNullOrEmpty(result))
+								if (string.IsNullOrEmpty(result))
 								{
 									this.OnStatusUpdated("Unable to get commit(s) ...");
 								}
@@ -143,7 +130,7 @@ namespace GitVersionTree.Services
 
 			this.OnStatusUpdated("Getting git merged branch(es) ...");
 			result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --all --merges --pretty=format:\"%h|%p\"");
-			if (String.IsNullOrEmpty(result))
+			if (string.IsNullOrEmpty(result))
 			{
 				this.OnStatusUpdated("Unable to get get branch or branch empty ...");
 			}
@@ -161,7 +148,7 @@ namespace GitVersionTree.Services
 						for (int i = 1; i < mergedParents.Length; i++)
 						{
 							result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --reverse --first-parent --pretty=format:\"%h\" " + mergedParents[i]);
-							if (String.IsNullOrEmpty(result))
+							if (string.IsNullOrEmpty(result))
 							{
 								this.OnStatusUpdated("Unable to get commit(s) ...");
 							}
@@ -184,54 +171,40 @@ namespace GitVersionTree.Services
 			{
 				nodes = (from node in nodes
 						 select node.Count > 2 ?
-									 (new List<string>(new[] { node[0], String.Format("{0} histories omitted", node.Count - 2), node[node.Count - 1] }))
+									 (new List<string>(new[] { node[0], string.Format("{0} histories omitted", node.Count - 2), node[node.Count - 1] }))
 									 : node).ToList();
 			}
 
-
 			this.OnStatusUpdated("Processed " + nodes.Count + " branch(es) ...");
+		}
+		//---------------------------------------------------------------------
+		private static string Execute(string command, string argument)
+		{
+			string executeResult = String.Empty;
 
-			GenerateDotFile(repositoryName, dotFilename, decorateDictionary, nodes);
+			Process executeProcess = new Process();
 
-			this.OnStatusUpdated("Generating version tree ...");
-			Process dotProcess = new Process();
-			dotProcess.StartInfo.UseShellExecute = false;
-			dotProcess.StartInfo.CreateNoWindow = true;
-			dotProcess.StartInfo.RedirectStandardOutput = true;
-			dotProcess.StartInfo.FileName = Properties.Settings.Default.GraphvizPath;
-			dotProcess.StartInfo.Arguments = "\"" + dotFilename + "\" -Tpdf -Gsize=10,10 -o\"" + pdfFilename + "\"";
-			dotProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-			dotProcess.Start();
-			dotProcess.WaitForExit();
+			executeProcess.StartInfo.UseShellExecute = false;
+			executeProcess.StartInfo.CreateNoWindow = true;
+			executeProcess.StartInfo.RedirectStandardOutput = true;
+			executeProcess.StartInfo.FileName = command;
+			executeProcess.StartInfo.Arguments = argument;
+			executeProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 
-			dotProcess.StartInfo.Arguments = "\"" + dotFilename + "\" -Tps -o\"" + pdfFilename.Replace(".pdf", ".ps") + "\"";
-			dotProcess.Start();
-			dotProcess.WaitForExit();
-			if (dotProcess.ExitCode == 0)
-			{
-				if (File.Exists(pdfFilename))
-				{
-#if (!DEBUG)
-					/*
-					Process ViewPdfProcess = new Process();
-					ViewPdfProcess.StartInfo.FileName = @PdfFilename;
-					ViewPdfProcess.Start();
-					//ViewPdfProcess.WaitForExit();
-					//Close();
-					*/
-#endif
-				}
-			}
+			executeProcess.Start();
+			executeResult = executeProcess.StandardOutput.ReadToEnd();
+			executeProcess.WaitForExit();
+
+			if (executeProcess.ExitCode == 0)
+				return executeResult;
 			else
-				this.OnStatusUpdated("Version tree generation failed ...");
-
-			this.OnStatusUpdated("Done! ...");
+				return String.Empty;
 		}
 		//---------------------------------------------------------------------
 		private void GenerateDotFile(
-			string repositoryName, 
-			string dotFilename, 
-			Dictionary<string, string> decorateDictionary, 
+			string repositoryName,
+			string dotFilename,
+			Dictionary<string, string> decorateDictionary,
 			List<List<string>> nodes)
 		{
 			StringBuilder dotStringBuilder = new StringBuilder();
@@ -260,12 +233,12 @@ namespace GitVersionTree.Services
 				dotStringBuilder.Append("  subgraph Decorate" + decorateCount + "\r\n");
 				dotStringBuilder.Append("  {\r\n");
 				dotStringBuilder.Append("    rank=\"same\";\r\n");
-				
+
 				if (decorateKeyValuePair.Value.Trim().StartsWith("(tag:"))
 					dotStringBuilder.Append("    \"" + decorateKeyValuePair.Value.Trim() + "\" [shape=\"box\", style=\"filled\", fillcolor=\"#ffffdd\"];\r\n");
 				else
 					dotStringBuilder.Append("    \"" + decorateKeyValuePair.Value.Trim() + "\" [shape=\"box\", style=\"filled\", fillcolor=\"#ddddff\"];\r\n");
-				
+
 				dotStringBuilder.Append("    \"" + decorateKeyValuePair.Value.Trim() + "\" -> \"" + decorateKeyValuePair.Key + "\" [weight=0, arrowtype=\"none\", dirtype=\"none\", arrowhead=\"none\", style=\"dotted\"];\r\n");
 				dotStringBuilder.Append("  }\r\n");
 			}
@@ -273,6 +246,49 @@ namespace GitVersionTree.Services
 			dotStringBuilder.Append("}\r\n");
 
 			File.WriteAllText(dotFilename, dotStringBuilder.ToString());
+		}
+		//---------------------------------------------------------------------
+		private void GenerateOutput(string repositoryName, string dotFilename, OutputFormat outputFormat)
+		{
+			this.OnStatusUpdated("Generating version tree ...");
+
+			string extension = outputFormat.ToString().ToLower();
+
+			string outputFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + "." + extension);
+			string arguments = "\"" + dotFilename + "\" -Tpdf -Gsize=10,10 -o\"" + outputFilename + "\"";
+
+			arguments = arguments.Replace("-Tpdf", "-T" + extension);
+
+			if (outputFormat != OutputFormat.PDF)
+				arguments = arguments.Replace("-Gsize=10,10 ", string.Empty);
+
+			Process dotProcess = new Process();
+			dotProcess.StartInfo.UseShellExecute = false;
+			dotProcess.StartInfo.CreateNoWindow = true;
+			dotProcess.StartInfo.RedirectStandardOutput = true;
+			dotProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+			dotProcess.StartInfo.FileName = Properties.Settings.Default.GraphvizPath;
+			dotProcess.StartInfo.Arguments = arguments;
+			dotProcess.Start();
+			dotProcess.WaitForExit();
+
+			if (dotProcess.ExitCode == 0)
+			{
+				if (File.Exists(outputFilename))
+				{
+#if (!DEBUG)
+					/*
+					Process ViewPdfProcess = new Process();
+					ViewPdfProcess.StartInfo.FileName = @PdfFilename;
+					ViewPdfProcess.Start();
+					//ViewPdfProcess.WaitForExit();
+					//Close();
+					*/
+#endif
+				}
+			}
+			else
+				this.OnStatusUpdated("Version tree generation failed ...");
 		}
 	}
 }
