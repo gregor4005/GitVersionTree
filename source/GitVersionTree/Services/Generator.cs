@@ -34,7 +34,7 @@ namespace GitVersionTree.Services
 			Dictionary<string, string> decorateDictionary = new Dictionary<string, string>();
 			List<List<string>> nodes = new List<List<string>>();
 
-			this.GetGitCommits(repositoryName, decorateDictionary, nodes, compressHistory);
+			this.GetGitCommits(gitRepositoryPath, decorateDictionary, nodes, compressHistory);
 			this.GenerateDotFile(repositoryName, dotFilename, decorateDictionary, nodes);
 			this.GenerateOutput(repositoryName, dotFilename, outputFormat);
 
