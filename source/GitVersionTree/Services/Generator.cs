@@ -187,29 +187,6 @@ namespace GitVersionTree.Services
 			this.OnStatusUpdated("Processed " + nodes.Count + " branch(es) ...");
 		}
 		//---------------------------------------------------------------------
-		private static string Execute(string command, string argument)
-		{
-			string executeResult = String.Empty;
-
-			Process executeProcess = new Process();
-
-			executeProcess.StartInfo.UseShellExecute = false;
-			executeProcess.StartInfo.CreateNoWindow = true;
-			executeProcess.StartInfo.RedirectStandardOutput = true;
-			executeProcess.StartInfo.FileName = command;
-			executeProcess.StartInfo.Arguments = argument;
-			executeProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-
-			executeProcess.Start();
-			executeResult = executeProcess.StandardOutput.ReadToEnd();
-			executeProcess.WaitForExit();
-
-			if (executeProcess.ExitCode == 0)
-				return executeResult;
-			else
-				return String.Empty;
-		}
-		//---------------------------------------------------------------------
 		private void GenerateDotFile(
 			string repositoryName,
 			string dotFilename,
@@ -298,6 +275,29 @@ namespace GitVersionTree.Services
 			}
 			else
 				this.OnStatusUpdated("Version tree generation failed ...");
+		}
+		//---------------------------------------------------------------------
+		private static string Execute(string command, string argument)
+		{
+			string executeResult = String.Empty;
+
+			Process executeProcess = new Process();
+
+			executeProcess.StartInfo.UseShellExecute = false;
+			executeProcess.StartInfo.CreateNoWindow = true;
+			executeProcess.StartInfo.RedirectStandardOutput = true;
+			executeProcess.StartInfo.FileName = command;
+			executeProcess.StartInfo.Arguments = argument;
+			executeProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+
+			executeProcess.Start();
+			executeResult = executeProcess.StandardOutput.ReadToEnd();
+			executeProcess.WaitForExit();
+
+			if (executeProcess.ExitCode == 0)
+				return executeResult;
+			else
+				return String.Empty;
 		}
 	}
 }
