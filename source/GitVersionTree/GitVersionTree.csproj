@@ -45,6 +45,9 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="CommandLineParser, Version=2.6.0.5, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\CommandLineArgumentsParser.2.6.0.5\lib\net40\CommandLineParser.dll</HintPath>
@@ -69,6 +72,7 @@
     <Compile Include="Forms\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Utils\ConsoleEx.cs" />
     <Compile Include="Utils\OutputFormat.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
