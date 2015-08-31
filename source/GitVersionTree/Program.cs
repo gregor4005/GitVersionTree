@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using GitVersionTree.Services;
+using GitVersionTree.Utils;
 
 namespace GitVersionTree
 {
@@ -38,7 +39,7 @@ namespace GitVersionTree
 		//---------------------------------------------------------------------
 		private static void RunAsCommandLine(string[] args)
 		{
-			AllocConsole();
+			ConsoleEx.Show();
 
 			CommandLine commandLine = CommandLine.GetCommandLine(args);
 
@@ -64,7 +65,7 @@ namespace GitVersionTree
 				generator.Generate(commandLine.GitRepositoryPath.ToString(), commandLine.Format);
 			}
 
-			Console.WriteLine("\nBye.");
+			Console.WriteLine("\nBye. Hit ENTER to exit...");
 
 			if (Debugger.IsAttached)
 				Console.ReadKey();

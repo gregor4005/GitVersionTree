@@ -34,6 +34,7 @@ Features
 - Tag and branch name on the side
 - Easy scrolling / zooming with PDF
 - different output-formats (PDF, EPS, SVG, Jpg)
+- command-line support (type `GitTreeView -h` for usage)
 
 Project Status
 --------------
@@ -71,16 +72,15 @@ Download
 
 Latest release:
 
-[v1.1](https://github.com/gfoidl/GitVersionTree/releases)
+[1.2](https://github.com/gfoidl/GitVersionTree/releases)
 
 Changelog
 ---------
-
-- v1.1 - 30. August 2015
+- 1.2 - 31. August 2015
+    - command-line support added
+- 1.1 - 30. August 2015
     - different output-formats
-    
 - v1.0 - 17 August 2013
-
 	- Initial baseline
 
 License

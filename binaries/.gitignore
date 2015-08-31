@@ -6,3 +6,4 @@
 *.pdf
 *.eps
 *.svg
+/CommandLineParser.dll
