@@ -44,6 +44,20 @@ namespace GitVersionTree
 
 			if (commandLine != null && commandLine.Run)
 			{
+				if (string.IsNullOrWhiteSpace(Properties.Settings.Default.GitPath))
+				{
+					Console.Write("Enter path to git.exe -> ");
+					Properties.Settings.Default.GitPath = Console.ReadLine();
+					Properties.Settings.Default.Save();
+				}
+
+				if (string.IsNullOrWhiteSpace(Properties.Settings.Default.GraphvizPath))
+				{
+					Console.Write("Enter path to dot.exe (graphviz) -> ");
+					Properties.Settings.Default.GraphvizPath = Console.ReadLine();
+					Properties.Settings.Default.Save();
+				}
+
 				Generator generator = new Generator();
 				generator.StatusUpdated += (s, e) => Console.WriteLine(e.Message);
 
