@@ -93,8 +93,7 @@ namespace GitVersionTree
 			OutputFormat outputFormat = (OutputFormat)Enum.Parse(typeof(OutputFormat), outputFormatListBox.SelectedItem as string);
 
 			StatusRichTextBox.Text = "";
-			string repositoryName = new DirectoryInfo(GitRepositoryPathTextBox.Text).Name;
-			_generator.Generate(repositoryName, outputFormat, IsCompressHistoryCheckBox.Checked);
+			_generator.Generate(GitRepositoryPathTextBox.Text, outputFormat, IsCompressHistoryCheckBox.Checked);
 		}
 		//---------------------------------------------------------------------
 		private void HomepageLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

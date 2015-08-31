@@ -19,9 +19,16 @@ namespace GitVersionTree.Services
 				tmp(this, new StatusEventArgs(message));
 		}
 		//---------------------------------------------------------------------
-		public void Generate(string repositoryName, OutputFormat outputFormat, bool compressHistory)
+		public void Generate(string repositoryName, string outputFormat, bool compressHistory = false)
 		{
-			string dotFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + ".dot");
+			OutputFormat of = (OutputFormat)Enum.Parse(typeof(OutputFormat), outputFormat);
+			this.Generate(repositoryName, of, compressHistory);
+		}
+		//---------------------------------------------------------------------
+		public void Generate(string gitRepositoryPath, OutputFormat outputFormat, bool compressHistory = false)
+		{
+			string repositoryName = new DirectoryInfo(gitRepositoryPath).Name;
+			string dotFilename 	  = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + ".dot");
 
 			Dictionary<string, string> decorateDictionary = new Dictionary<string, string>();
 			List<List<string>> nodes = new List<List<string>>();
@@ -34,19 +41,20 @@ namespace GitVersionTree.Services
 		}
 		//---------------------------------------------------------------------
 		private void GetGitCommits(
-			string repositoryName,
+			string gitRepositoryPath,
 			Dictionary<string, string> decorateDictionary,
 			List<List<string>> nodes,
 			bool compressHistory)
 		{
-			string logFilename = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + ".log");
+			string repositoryName = new DirectoryInfo(gitRepositoryPath).Name;
+			string logFilename 	  = Path.Combine(Directory.GetParent(Application.ExecutablePath).ToString(), repositoryName + ".log");
 			File.WriteAllText(logFilename, "");
 
 			string[] mergedColumns;
 			string[] mergedParents;
 
 			this.OnStatusUpdated("Getting git commit(s) ...");
-			string result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --all --pretty=format:\"%h|%p|%d\"");
+			string result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(gitRepositoryPath, ".git") + "\" log --all --pretty=format:\"%h|%p|%d\"");
 
 			if (string.IsNullOrEmpty(result))
 				this.OnStatusUpdated("Unable to get get branch or branch empty ...");
@@ -67,7 +75,7 @@ namespace GitVersionTree.Services
 			}
 
 			this.OnStatusUpdated("Getting git ref branch(es) ...");
-			result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" for-each-ref --format=\"%(objectname:short)|%(refname:short)\" "); //refs/heads/
+			result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(gitRepositoryPath, ".git") + "\" for-each-ref --format=\"%(objectname:short)|%(refname:short)\" "); //refs/heads/
 
 			if (string.IsNullOrEmpty(result))
 				this.OnStatusUpdated("Unable to get get branch or branch empty ...");
@@ -84,7 +92,7 @@ namespace GitVersionTree.Services
 						if (!refColumns[1].ToLower().StartsWith("refs/tags"))
 							if (refColumns[1].ToLower().Contains("master"))
 							{
-								result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --reverse --first-parent --pretty=format:\"%h\" " + refColumns[0]);
+								result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(gitRepositoryPath, ".git") + "\" log --reverse --first-parent --pretty=format:\"%h\" " + refColumns[0]);
 								if (string.IsNullOrEmpty(result))
 								{
 									this.OnStatusUpdated("Unable to get commit(s) ...");
@@ -109,7 +117,7 @@ namespace GitVersionTree.Services
 						if (!refColumns[1].ToLower().StartsWith("refs/tags"))
 							if (!refColumns[1].ToLower().Contains("master"))
 							{
-								result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --reverse --first-parent --pretty=format:\"%h\" " + refColumns[0]);
+								result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(gitRepositoryPath, ".git") + "\" log --reverse --first-parent --pretty=format:\"%h\" " + refColumns[0]);
 								if (string.IsNullOrEmpty(result))
 								{
 									this.OnStatusUpdated("Unable to get commit(s) ...");
@@ -129,7 +137,7 @@ namespace GitVersionTree.Services
 			}
 
 			this.OnStatusUpdated("Getting git merged branch(es) ...");
-			result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --all --merges --pretty=format:\"%h|%p\"");
+			result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(gitRepositoryPath, ".git") + "\" log --all --merges --pretty=format:\"%h|%p\"");
 			if (string.IsNullOrEmpty(result))
 			{
 				this.OnStatusUpdated("Unable to get get branch or branch empty ...");
@@ -147,7 +155,7 @@ namespace GitVersionTree.Services
 					{
 						for (int i = 1; i < mergedParents.Length; i++)
 						{
-							result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(Properties.Settings.Default.GitRepositoryPath, ".git") + "\" log --reverse --first-parent --pretty=format:\"%h\" " + mergedParents[i]);
+							result = Execute(Properties.Settings.Default.GitPath, "--git-dir \"" + Path.Combine(gitRepositoryPath, ".git") + "\" log --reverse --first-parent --pretty=format:\"%h\" " + mergedParents[i]);
 							if (string.IsNullOrEmpty(result))
 							{
 								this.OnStatusUpdated("Unable to get commit(s) ...");
