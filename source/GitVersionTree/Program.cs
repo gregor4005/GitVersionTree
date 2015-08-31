@@ -40,10 +40,15 @@ namespace GitVersionTree
 		{
 			AllocConsole();
 
-			Generator generator = new Generator();
-			generator.StatusUpdated += (s, e) => Console.WriteLine(e.Message);
+			CommandLine commandLine = CommandLine.GetCommandLine(args);
 
-			generator.Generate(args[0], args[1]);
+			if (commandLine != null && commandLine.Run)
+			{
+				Generator generator = new Generator();
+				generator.StatusUpdated += (s, e) => Console.WriteLine(e.Message);
+
+				generator.Generate(commandLine.GitRepositoryPath.ToString(), commandLine.Format);
+			}
 
 			Console.WriteLine("\nBye.");
 
