@@ -12,6 +12,7 @@ namespace GitVersionTree.Services
 	public class Generator
 	{
 		public event EventHandler<StatusEventArgs> StatusUpdated;
+		[DebuggerNonUserCode]
 		private void OnStatusUpdated(string message)
 		{
 			var tmp = this.StatusUpdated;
