@@ -1,3 +1,9 @@
 /GitVersionTree.vshost.exe
 /GitVersionTree.vshost.exe.config
 /GitVersionTree.vshost.exe.manifest
+*.dot
+*.jpg
+*.pdf
+*.eps
+*.svg
+/CommandLineParser.dll
